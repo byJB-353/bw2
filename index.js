@@ -28,7 +28,7 @@ const isGroup = from.endsWith('@g.us')
 const sender = isGroup ? (mek.key.participant ? mek.key.participant : mek.participant) : mek.key.remoteJid
 const pushname =  mek.pushName || "Persona sin nombre"
 
-//Informaci�n del grupo
+//Información del grupo
 const groupMetadata = isGroup ? await client.groupMetadata(from) : ''
 const groupId = isGroup ? groupMetadata.id : ''
 const groupOwner = isGroup ? groupMetadata.owner : ''
@@ -53,10 +53,10 @@ const reply = (texto) => {
         
         //Muesta el comando usado en la consola
 if (isCmd && isGroup) {
-console.log(color('[', 'magenta'), color('➳', 'white'), color(']', 'magenta'), color('Comando'), color(`${prefix + command}`, 'white'), color('Nombre'), color(`${isOwner ? 'Es Mi creador 👑' : `${pushname}`}`, 'white'), color('En el Grupo'), color(`${groupName}`, 'yellow'), 'Args:', color(args.length))
+console.log(color('[', 'magenta'), color('âž³', 'white'), color(']', 'magenta'), color('Comando'), color(`${prefix + command}`, 'white'), color('Nombre'), color(`${isOwner ? 'Es Mi creador ðŸ‘‘' : `${pushname}`}`, 'white'), color('En el Grupo'), color(`${groupName}`, 'yellow'), 'Args:', color(args.length))
 }
 if (isCmd && !isGroup) {
-console.log(color('[', 'magenta'), color('➳', 'white'), color(']', 'magenta'), color('Comando'), color(`${prefix + command}`, 'white'), color('En Privado'), color('De', 'yellow'), color(`${isOwner ? 'Mi creador 👑' : `${pushname}`}`, 'white'), 'args:', color(args.length))
+console.log(color('[', 'magenta'), color('âž³', 'white'), color(']', 'magenta'), color('Comando'), color(`${prefix + command}`, 'white'), color('En Privado'), color('De', 'yellow'), color(`${isOwner ? 'Mi creador ðŸ‘‘' : `${pushname}`}`, 'white'), 'args:', color(args.length))
 }
 
 client.ev.on('presence-update', json => console.log(json))
@@ -92,6 +92,43 @@ break
 }
 //coneccion con html
 const express = require('./v.html')
+//comandos
+case 's':
+case 'stik':
+case 'stiker':
+case 'sticker':
+await v.react('✨')
+if ((v.type === 'imageMessage') || isQuotedImage) {
+	v.reply(mess.wait)
+	var nameJpg = getRandom('.jpg')
+	isQuotedImage ? await v.quoted.download(nameJpg) : await v.download(nameJpg)
+	var stik = await imageToWebp(nameJpg)
+	writeExif(stik, {packname: 'ღ ' + v.pushName + ' 乂 ' + senderNumber + ' ღ', author: ''})
+		.then(x => v.replyS(x))
+} else if ((v.type === 'videoMessage') || isQuotedVideo) {
+	v.reply(mess.wait)
+	var nameMp4 = getRandom('.mp4')
+	isQuotedVideo ? await v.quoted.download(nameMp4) : await v.download(nameMp4)
+	var stik = await videoToWebp(nameMp4)
+	writeExif(stik, {packname: 'ღ ' + v.pushName + ' 乂 ' + senderNumber + ' ღ', author: ''})
+		.then(x => v.replyS(x))
+} else {
+	v.reply('Responda a una imagen o video con el comando ' + prefix + command)
+}
+break
+
+case 'robar':
+await v.react('✨')
+if (!isQuotedSticker) return v.reply('Responda a un sticker con el comando ' + prefix + command + ' <texto>')
+var pack = q.split('|')[0]
+var author = q.split('|')[1]
+v.reply(mess.wait)
+var nameWebp = getRandom('.webp')
+var media = await v.quoted.download(nameWebp)
+await writeExif(media, {packname: pack, author: author})
+	.then(x => v.replyS(x))
+await fs.unlinkSync(nameWebp)
+break
 //Fin
 } catch (e) {
 const error = String(e)
